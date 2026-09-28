@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>My Todo Application</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>My Todo Application</h1>
+
+
+    <!-- MESSAGE -->
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+
+    <!-- ADD TASK -->
+
+    <div class="form-box">
+
+        <h2>Add New Task</h2>
+
+        <form action="/add" method="POST">
+
+
+            <label>Task Title</label>
+
+            <input type="text"
+                   name="title"
+                   maxlength="150"
+                   required>
+
+
+            <label>Description</label>
+
+            <textarea name="description"
+                      maxlength="300"></textarea>
+
+
+            <label>Priority</label>
+
+            <select name="priority" required>
+
+                <option value="High">
+                    High
+                </option>
+
+                <option value="Medium" selected>
+                    Medium
+                </option>
+
+                <option value="Low">
+                    Low
+                </option>
+
+            </select>
+
+
+            <label>Due Date</label>
+
+            <input type="date"
+                   name="due_date"
+                   min="{{ today }}"
+                   required>
+
+
+            <button type="submit">
+                Add Task
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- PENDING TASKS -->
+    <!-- ================================= -->
+
+    <h2>Pending Tasks</h2>
+
+
+    {% if pending_tasks %}
+
+    <table>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Title</th>
+
+            <th>Description</th>
+
+            <th>Priority</th>
+
+            <th>Due Date</th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+        </tr>
+
+
+        {% for task in pending_tasks %}
+
+        <tr>
+
+            <td>
+                {{ task["id"] }}
+            </td>
+
+
+            <td>
+                {{ task["title"] }}
+            </td>
+
+
+            <td>
+                {{ task["description"] }}
+            </td>
+
+
+            <td>
+                {{ task["priority"] }}
+            </td>
+
+
+            <td>
+                {{ task["due_date"] }}
+            </td>
+
+
+            <td>
+
+                <span class="pending">
+                    Pending
+                </span>
+
+            </td>
+
+
+            <!-- ACTION -->
+
+            <td>
+
+
+                <!-- COMPLETE -->
+
+                <a href="/toggle/{{ task['id'] }}"
+                   class="complete-btn">
+
+                    Complete
+
+                </a>
+
+
+
+                <!-- EDIT -->
+
+                <details>
+
+                    <summary class="edit-btn">
+                        Edit
+                    </summary>
+
+
+                </form>
+
+                </details>
+                <!-- DELETE -->
+
+                <form action="/delete/{{ task['id'] }}"
+                      method="POST"
+                      class="inline-form">
+
+
+                    <button type="submit"
+                            class="delete-btn"
+                            onclick="return confirm('Delete this task?')">
+
+                        Delete
+
+                    </button>
+
+                </form>
+
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    {% else %}
+
+        <p class="no-task">
+            No pending tasks.
+        </p>
+
+    {% endif %}
+
+
+
+    <!-- ================================= -->
+    <!-- COMPLETED TASKS -->
+    <!-- ================================= -->
+
+    <h2>Completed Tasks</h2>
+
+
+    {% if completed_tasks %}
+
+    <table>
+
+        <tr>
+
+            <th>ID</th>
+
+            <th>Title</th>
+
+            <th>Description</th>
+
+            <th>Priority</th>
+
+            <th>Due Date</th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+        </tr>
+
+
+        {% for task in completed_tasks %}
+
+        <tr>
+
+            <td>
+                {{ task["id"] }}
+            </td>
+
+
+            <td>
+                {{ task["title"] }}
+            </td>
+
+
+            <td>
+                {{ task["description"] }}
+            </td>
+
+
+            <td>
+                {{ task["priority"] }}
+            </td>
+
+
+            <td>
+                {{ task["due_date"] }}
+            </td>
+
+
+            <td>
+
+                <span class="completed">
+                    Completed
+                </span>
+
+            </td>
+
+
+            <!-- ONLY EDIT + DELETE -->
+
+            <td>
+
+
+                <!-- EDIT -->
+
+                <details>
+
+                    <summary class="edit-btn">
+                        Edit
+                    </summary>
+
+
+
+                    
+
+
+                    </form>
+
+                </details>
+
+
+
+                <!-- DELETE -->
+
+                <form action="/delete/{{ task['id'] }}"
+                      method="POST"
+                      class="inline-form">
+
+
+                    <button type="submit"
+                            class="delete-btn"
+                            onclick="return confirm('Delete this task?')">
+
+                        Delete
+
+                    </button>
+
+                </form>
+
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    {% else %}
+
+        <p class="no-task">
+            No completed tasks.
+        </p>
+
+    {% endif %}
+
+
+</div>
+
+</body>
+
+</html>
