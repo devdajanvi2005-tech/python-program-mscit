@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>To-Do App</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>--To-Do App--</h1>
+
+    {% if message %}
+
+    <div class="message">
+        {{ message }}
+    </div>
+
+    {% endif %}
+
+
+    <div class="box">
+
+        {% if edit_task %}
+
+        <h2>Update Task</h2>
+
+        <form method="POST"
+              action="/update/{{ edit_task.id }}">
+
+        {% else %}
+
+        <h2>Add New Task</h2>
+
+        <form method="POST"
+              action="/add">
+
+        {% endif %}
+
+
+            <label>Title</label>
+
+            <input
+                type="text"
+                name="title"
+                value="{{ edit_task.title if edit_task else '' }}"
+                placeholder="Enter task title"
+                required
+            >
+
+
+            <label>Description</label>
+
+            <textarea
+                name="description"
+                placeholder="Enter task description"
+                required
+            >{{ edit_task.description if edit_task else '' }}</textarea>
+
+
+            <label>Priority</label>
+
+            <select name="priority" required>
+
+                <option value="High"
+                    {% if edit_task and edit_task.priority == "High" %}
+                    selected
+                    {% endif %}>
+                    High
+                </option>
+
+                <option value="Medium"
+                    {% if not edit_task or edit_task.priority == "Medium" %}
+                    selected
+                    {% endif %}>
+                    Medium
+                </option>
+
+                <option value="Low"
+                    {% if edit_task and edit_task.priority == "Low" %}
+                    selected
+                    {% endif %}>
+                    Low
+                </option>
+
+            </select>
+
+
+            <label>Due Date</label>
+
+            <input
+                type="date"
+                name="due_date"
+                value="{{ edit_task.due_date if edit_task else today }}"
+                min="{{ today }}"
+                required
+            >
+
+
+            <label>Status</label>
+
+            <select name="status" required>
+
+                {% if edit_task %}
+
+                <option value="Pending"
+                    {% if edit_task.status == "Pending" %}
+                    selected
+                    {% endif %}>
+                    Pending
+                </option>
+
+                <option value="In Progress"
+                    {% if edit_task.status == "In Progress" %}
+                    selected
+                    {% endif %}>
+                    In Progress
+                </option>
+
+                <option value="Completed"
+                    {% if edit_task.status == "Completed" %}
+                    selected
+                    {% endif %}>
+                    Completed
+                </option>
+
+                {% else %}
+
+                <option value="Pending" selected>
+                    Pending
+                </option>
+
+                <option value="In Progress">
+                    In Progress
+                </option>
+
+                {% endif %}
+
+            </select>
+
+
+            {% if edit_task %}
+
+            <button type="submit">
+                Update Task
+            </button>
+
+            <a href="/" class="cancel">
+                Cancel
+            </a>
+
+            {% else %}
+
+            <button type="submit">
+                Add Task
+            </button>
+
+            {% endif %}
+
+        </form>
+
+    </div>
+
+
+    <div class="box">
+
+        <h2>Pending Tasks</h2>
+
+        {% if pending_tasks %}
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Due Date</th>
+                <th>Action</th>
+            </tr>
+
+            {% for task in pending_tasks %}
+
+            <tr>
+
+                <td>{{ task.id }}</td>
+
+                <td>{{ task.title }}</td>
+
+                <td>{{ task.description }}</td>
+
+                <td>{{ task.priority }}</td>
+
+                <td>{{ task.due_date }}</td>
+
+                <td class="actions">
+
+                    <a class="edit"
+                       href="/edit/{{ task.id }}">
+                        Edit
+                    </a>
+
+                    <a class="delete"
+                       href="/delete/{{ task.id }}"
+                       onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        {% else %}
+
+        <p>No pending tasks.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="box">
+
+        <h2>In Progress Tasks</h2>
+
+        {% if in_progress_tasks %}
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Due Date</th>
+                <th>Action</th>
+            </tr>
+
+            {% for task in in_progress_tasks %}
+
+            <tr>
+
+                <td>{{ task.id }}</td>
+
+                <td>{{ task.title }}</td>
+
+                <td>{{ task.description }}</td>
+
+                <td>{{ task.priority }}</td>
+
+                <td>{{ task.due_date }}</td>
+
+                <td class="actions">
+
+                    <a class="edit"
+                       href="/edit/{{ task.id }}">
+                        Edit
+                    </a>
+
+                    <a class="delete"
+                       href="/delete/{{ task.id }}"
+                       onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        {% else %}
+
+        <p>No in-progress tasks.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="box">
+
+        <h2>Completed Tasks</h2>
+
+        {% if completed_tasks %}
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Due Date</th>
+                <th>Action</th>
+            </tr>
+
+            {% for task in completed_tasks %}
+
+            <tr>
+
+                <td>{{ task.id }}</td>
+
+                <td>{{ task.title }}</td>
+
+                <td>{{ task.description }}</td>
+
+                <td>{{ task.priority }}</td>
+
+                <td>{{ task.due_date }}</td>
+
+                <td class="actions">
+
+                    <a class="edit"
+                       href="/edit/{{ task.id }}">
+                        Edit
+                    </a>
+
+                    <a class="delete"
+                       href="/delete/{{ task.id }}"
+                       onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        {% else %}
+
+        <p>No completed tasks.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
