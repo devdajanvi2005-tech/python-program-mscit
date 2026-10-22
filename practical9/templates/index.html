@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Task Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f3f4f6;
+            color: #222;
+        }
+
+        body.dark {
+            background: #18181b;
+            color: #f4f4f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .panel {
+            background: white;
+            color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 18px 0;
+        }
+
+        body.dark .panel {
+            background: #27272a;
+            color: #f4f4f5;
+        }
+
+        input, textarea, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 100%;
+        }
+
+        input, textarea, select {
+            width: 100%;
+        }
+
+        button, .btn {
+            display: inline-block;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 5px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .delete {
+            background: #dc2626;
+        }
+
+        .complete {
+            background: #15803d;
+        }
+
+        .edit {
+            background: #d97706;
+        }
+
+        .task {
+            border-bottom: 1px solid #ccc;
+            padding: 12px 0;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .actions button {
+            margin: 0;
+        }
+
+        .top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        small {
+            display: block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body class="{{ 'dark' if theme == 'dark' else '' }}">
+<div class="container">
+
+    <div class="top">
+        <h1>Personal Task Tracker</h1>
+        <p>Welcome, <strong>{{ username }}</strong></p>
+    </div>
+
+    <div class="top">
+        <a class="btn" href="/set-theme/light">Light Theme</a>
+        <a class="btn" href="/set-theme/dark">Dark Theme</a>
+        <a class="btn delete" href="/logout">Logout</a>
+    </div>
+
+    <div class="panel">
+        <h2>Add New Task</h2>
+
+        <form action="/add" method="post">
+            <label>Task Title</label>
+            <input
+                type="text"
+                name="title"
+                maxlength="150"
+                placeholder="Enter task title"
+                required
+            >
+
+            <label>Description</label>
+            <textarea
+                name="description"
+                maxlength="300"
+                placeholder="Enter task description"
+            ></textarea>
+
+            <label>Priority</label>
+            <select name="priority">
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+            </select>
+
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>Pending Tasks ({{ pending_tasks|length }})</h2>
+
+        {% for task in pending_tasks %}
+        <div class="task">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+
+            <small>Priority: {{ task.priority }}</small>
+            <small>
+                Created:
+                {{ task.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </small>
+
+            <div class="actions">
+                <a class="btn complete"
+                   href="/toggle/{{ task.id }}">
+                    Complete
+                </a>
+
+                <a class="btn edit"
+                   href="/edit/{{ task.id }}">
+                    Edit
+                </a>
+
+                <form action="/delete/{{ task.id }}" method="post"
+                      onsubmit="return confirm('Delete this task?');">
+                    <button class="delete" type="submit">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p>No pending tasks.</p>
+        {% endfor %}
+    </div>
+
+    <div class="panel">
+        <h2>Completed Tasks ({{ completed_tasks|length }})</h2>
+
+        {% for task in completed_tasks %}
+        <div class="task">
+            <h3>{{ task.title }} ✓</h3>
+            <p>{{ task.description }}</p>
+
+            <small>Priority: {{ task.priority }}</small>
+
+            <div class="actions">
+                <a class="btn" href="/toggle/{{ task.id }}">
+                    Mark Pending
+                </a>
+
+                <a class="btn edit" href="/edit/{{ task.id }}">
+                    Edit
+                </a>
+
+                <form action="/delete/{{ task.id }}" method="post"
+                      onsubmit="return confirm('Delete this task?');">
+                    <button class="delete" type="submit">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p>No completed tasks.</p>
+        {% endfor %}
+    </div>
+
+</div>
+</body>
+</html>
